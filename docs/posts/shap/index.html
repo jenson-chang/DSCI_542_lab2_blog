@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Jenson Chang">
+<meta name="dcterms.date" content="2025-01-14">
 
-<title>DSCI 542 Lab 2 Blog</title>
+<title>Feature Intepretation for a k-Nearest Neighbour Classifier – DSCI 542 Lab 2 Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,27 +22,59 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -68,77 +102,19 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
 
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">DSCI 542 Lab 2 Blog</span>
     </a>
   </div>
@@ -149,7 +125,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
@@ -172,77 +148,130 @@ window.Quarto = {
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">DSCI 542 Lab 2 Blog</h1>
-                      </div>
+    <div class="quarto-title column-body">
+      <h1 class="title">Feature Intepretation for a k-Nearest Neighbour Classifier</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">sklearn</div>
+              </div>
+                  </div>
   </div>
     
   
-  <div class="quarto-title-meta column-page-left">
+  <div class="quarto-title-meta">
 
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Jenson Chang </p>
+            </div>
+    </div>
       
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 14, 2025</p>
+      </div>
+    </div>
     
       
     </div>
     
   
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="sklearn">sklearn <span class="quarto-category-count">(1)</span></div></div></div>
+    
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
 
 
+<p>Understanding the inner workings of machine learning models is crucial in being able to explain the behaviour of the model. A k-Nearest Neighbour (kNN) model does not have coefficients like a linear model that can be used to explain feature importance. SHAP (SHapley Additive exPlanations) is a powerful tool for explaining model predictions, even for models that may seem like a “black box” such as kNN. This post will explain the steps needed to create a SHAP plots to interpret feature importance for using a kNN classifier in scikit-learn.</p>
+<section id="computing-shap-values" class="level2">
+<h2 class="anchored" data-anchor-id="computing-shap-values">Computing SHAP values</h2>
+<p>The scope of this post is to focus on SHAP plot generation and plot interpretation. Therefore we start with a pre-trained pipeline with a kNN model. The example model used is from <a href="https://github.com/UBC-MDS/academic-success-prediction">UBC MDS Student’s Academic Success Prediction</a> project. This model predicts whether a first year university student would dropout of school using academic and social indicators. Please refer to the GitHub page for more information on the dataset and how the model was developed.</p>
+<section id="step-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-1">Step 1</h3>
+<p>To start, we first need perform some preparation steps. We need to first extract the prediction model <code>knn</code> from <code>my_pipeline</code> and transform our training data (<code>X_train</code>) and test data (<code>X_test</code>) with the preprocessor</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the KNN classifier from the pipeline</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>knn <span class="op">=</span> my_pipeline.named_steps[<span class="st">'kneighborsclassifier'</span>]</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Preprocess the training and testing data</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>X_train_preprocessed <span class="op">=</span> my_pipeline[:<span class="op">-</span><span class="dv">1</span>].transform(X_train)  <span class="co"># Apply all steps except the final classifier</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>X_test_preprocessed <span class="op">=</span> my_pipeline[:<span class="op">-</span><span class="dv">1</span>].transform(X_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-2" class="level3">
+<h3 class="anchored" data-anchor-id="step-2">Step 2</h3>
+<p>Since kNN does not provide direct interpretability, we’ll use SHAP’s <code>KernelExplainer</code>, which works with any model that has a <code>predict_proba</code> method.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define SHAP Kernel Explainer with the predict_proba method</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>explainer <span class="op">=</span> shap.KernelExplainer(knn.predict_proba, X_train_preprocessed)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate SHAP values for the test dataset</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>shap_values <span class="op">=</span> explainer.shap_values(X_test_preprocessed)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The <code>shap_values</code> object now contains SHAP values for all classes. Each element in <code>shap_values</code> corresponds to one class.</p>
+</section>
+<section id="step-3-optional" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-optional">Step 3 (Optional)</h3>
+<p>Depending on the size of the dataset, the <code>KernelExplainer</code> in the may give a warning about slow runtimes.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./explainer_warning.png" class="img-fluid figure-img"></p>
+<figcaption>Warning about long runtime from KernelExplainer</figcaption>
+</figure>
+</div>
+<p>To reduce the runtime, we can subsample our data before passing it to <code>KernelExplainer</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reduce the dataset to 100 samples for KernelExplainer</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>subsample <span class="op">=</span> shap.sample(X_train_preprocessed, <span class="dv">100</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>explainer <span class="op">=</span> shap.KernelExplainer(knn.predict_proba, subsample)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>shap_values <span class="op">=</span> explainer.shap_values(X_test_preprocessed)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="step-4" class="level3">
+<h3 class="anchored" data-anchor-id="step-4">Step 4</h3>
+<p>To focus on a specific class, select its SHAP values and generate a summary plot. In the example model, Class 0 corresponds <code>Dropout</code> which is the class we want to analyze.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>feature_names <span class="op">=</span> pipeline[:<span class="op">-</span><span class="dv">1</span>].get_feature_names_out()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>shap.summary_plot(shap_values[:,:,<span class="dv">0</span>], X_test_preprocessed, feature_names<span class="op">=</span>feature_names)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="intepreting-shap-plot" class="level2">
+<h2 class="anchored" data-anchor-id="intepreting-shap-plot">Intepreting SHAP plot</h2>
+<p><img src="./shap_plot.png" width="600"></p>
+<section id="understanding-the-components-of-the-plot" class="level3">
+<h3 class="anchored" data-anchor-id="understanding-the-components-of-the-plot">Understanding the Components of the Plot</h3>
+<ol type="1">
+<li>X-Axis (SHAP Value): Indicates how much a feature pushes the prediction towards the class <code>Dropout</code>.</li>
+<li>Y-Axis (Features): Features are sorted by their importance for the class <code>Dropout</code>.</li>
+<li>Color (Feature Value): Shows whether the feature value is high (red) or low (blue).</li>
+</ol>
+</section>
+<section id="plot-interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="plot-interpretation">Plot Interpretation</h3>
+<ol type="1">
+<li>Feature Importance: Features are sorted by their average impact on predictions for the class <code>Dropout</code>.</li>
+<li>Feature Effects: Each dot represents a single sample, and its position along the X-axis shows the magnitude and direction of the feature’s effect.</li>
+<li>Color Gradient: Indicates feature values (e.g., blue for low and red for high).</li>
+</ol>
+<p><strong>Example 1</strong></p>
+<p><img src="./2nd_sem_grade.png" width="600"></p>
+<p>This feature represents the average grade of the students in the 2nd semester. We see the students with higher grades (red) clustered on the left side, indicating students with higher grades reduces the prediction for dropout. The students with lower grades (blue) are clustered on the right, indicating they are more likely to push the model to predict dropout. We see there’s no overlap between the two groups in the middle. This show theres a distinct pattern and a strong relationship between 2nd semster grade and our predictor.</p>
+<p><strong>Example 2</strong></p>
+<p><img src="./admission_grade.png" width="600"></p>
+<p>This feature represents the grade the student had at the time of admission. Similar to <em>Curricular units 2nd sem (grade)</em>, we see a cluster of red points (higher grades) on the left and blue points (lower grades) on the right. However there’s an overlap of the two groups in the middle. The seperation between the two groups is not as strong as <em>Curricular units 2nd sem (grade)</em>. Therefore the relative prediction power of <em>Admission Grade</em> is not as strong. The points in the middle are not pushing the prediction outcome to one class or another.</p>
+<p><strong>Example 3</strong></p>
+<p><img src="./1st_sem_eval.png" width="600"></p>
+<p>This feature represents the number of non-evaluation courses (no exams) the student is taking. We no longer see a left/right clustering like in previous examples. The points in blue are students that are taking very little or none of these courses. These points are centered around 0 and not contributing much to our prediction. On the other hands, we see students who take a higher amount of these courses distributed evenly on the left and on the right. There’s no strong relationship between whether a student drops out and the number of non-evaluation courses that they take.</p>
+</section>
+</section>
+<section id="takeaway" class="level2">
+<h2 class="anchored" data-anchor-id="takeaway">Takeaway</h2>
+<p>SHAP plots provide a powerful way to demystify KNN classifiers, which are often considered black-box models. By analyzing SHAP values, you can identify the most influential features for each class.</p>
+<p>SHAP helps bridge the gap between machine learning models and human interpretability, making your models more transparent and trustworthy.</p>
 
 
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="sklearn" data-listing-date-sort="1736841600000" data-listing-file-modified-sort="1737228786707" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="814">
-<div class="thumbnail">
-<p><a href="./posts/shap/index.html" class="no-external"></a></p><a href="./posts/shap/index.html" class="no-external">
-<p class="card-img-top"><img src="posts/shap/explainer_warning.png"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/shap/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/shap/index.html" class="no-external">Feature Intepretation for a k-Nearest Neighbour Classifier</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/shap/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('sklearn'); return false;">
-sklearn
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/shap/index.html" class="no-external">Understanding the inner workings of machine learning models is crucial in being able to explain the behaviour of the model. A k-Nearest Neighbour (kNN) model does not have…</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/shap/index.html" class="no-external">
-<div class="listing-date">
-Jan 14, 2025
-</div>
-<div class="listing-author">
-Jenson Chang
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
