@@ -1,15 +1,15 @@
 ---
-title: "Feature Intepretation for a k-Nearest Neighbour Classifier"
+title: "Feature Interpretation for a k-Nearest Neighbor Classifier"
 author: "Jenson Chang"
 date: "2025-01-14"
 categories: [sklearn]
 ---
-Understanding the inner workings of machine learning models is crucial in being able to explain the behaviour of the model. A k-Nearest Neighbour (kNN) model does not have coefficients like a linear model that can be used to explain feature importance. SHAP (SHapley Additive exPlanations) is a powerful tool for explaining model predictions, even for models that may seem like a "black box" such as kNN. This post will explain the steps needed to create a SHAP plots to interpret feature importance for using a kNN classifier in scikit-learn.
+Understanding the inner workings of machine learning models is crucial in being able to explain the behavior of the model. A k-Nearest Neighbor (kNN) model does not have coefficients like a linear model that can be used to explain feature importance. SHAP (SHapley Additive explanations) is a powerful tool for explaining model predictions, even for models that may seem like a "black box" such as kNN. This post will explain the steps needed to create a SHAP plots to interpret feature importance for using a kNN classifier in scikit-learn.
 
 ## Computing SHAP values
 The scope of this post is to focus on SHAP plot generation and plot interpretation. Therefore we start with a pre-trained pipeline with a kNN model. The example model used is from [UBC MDS Student's Academic Success Prediction](https://github.com/UBC-MDS/academic-success-prediction) project. This model predicts whether a first year university student would dropout of school using academic and social indicators. Please refer to the GitHub page for more information on the dataset and how the model was developed. 
 
-### Step 1 
+### Step 1. Data Preparation
 To start, we first need perform some preparation steps. We need to first extract the prediction model `knn` from `my_pipeline` and transform our training data (`X_train`) and test data (`X_test`) with the preprocessor
 
 ```python
@@ -21,7 +21,7 @@ X_train_preprocessed = my_pipeline[:-1].transform(X_train)  # Apply all steps ex
 X_test_preprocessed = my_pipeline[:-1].transform(X_test)
 ```
 
-### Step 2
+### Step 2. SHAP Values
 Since kNN does not provide direct interpretability, we’ll use SHAP’s `KernelExplainer`, which works with any model that has a `predict_proba` method.
 ```python
 # Define SHAP Kernel Explainer with the predict_proba method
@@ -32,7 +32,7 @@ shap_values = explainer.shap_values(X_test_preprocessed)
 ```
 The `shap_values` object now contains SHAP values for all classes. Each element in `shap_values` corresponds to one class.
 
-### Step 3 (Optional)
+### Step 3. Subsample (Optional)
 Depending on the size of the dataset, the `KernelExplainer` in the may give a warning about slow runtimes.
 
 ![Warning about long runtime from KernelExplainer](./explainer_warning.png)
@@ -88,6 +88,11 @@ This feature represents the number of non-evaluation courses (no exams) the stud
 
 ## Takeaway
 
-SHAP plots provide a powerful way to demystify KNN classifiers, which are often considered black-box models. By analyzing SHAP values, you can identify the most influential features for each class.
+SHAP plots provide a powerful way to demystify KNN classifiers, which are often considered black-box models. By analyzing SHAP values, we can identify the most influential features for each class.
 
-SHAP helps bridge the gap between machine learning models and human interpretability, making your models more transparent and trustworthy.
+SHAP helps bridge the gap between machine learning models and human interpretability, making models more transparent and trustworthy.
+
+## References
+"Academic Success Prediction." https://github.com/UBC-MDS/academic-success-prediction
+
+SHAP. “Iris Classification with Scikit-Learn: K-Nearest Neighbors.” SHAP Documentation. https://shap.readthedocs.io/en/latest/example_notebooks/tabular_examples/model_agnostic/Iris%20classification%20with%20scikit-learn.html#K-nearest-neighbors.

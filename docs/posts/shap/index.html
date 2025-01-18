@@ -9,7 +9,7 @@
 <meta name="author" content="Jenson Chang">
 <meta name="dcterms.date" content="2025-01-14">
 
-<title>Feature Intepretation for a k-Nearest Neighbour Classifier – DSCI 542 Lab 2 Blog</title>
+<title>Feature Interpretation for a k-Nearest Neighbor Classifier – DSCI 542 Lab 2 Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -110,7 +110,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <body class="nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+  <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
@@ -146,54 +146,53 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title">Feature Intepretation for a k-Nearest Neighbour Classifier</h1>
-                                <div class="quarto-categories">
-                <div class="quarto-category">sklearn</div>
-              </div>
-                  </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      <div>
-      <div class="quarto-title-meta-heading">Author</div>
-      <div class="quarto-title-meta-contents">
-               <p>Jenson Chang </p>
-            </div>
-    </div>
-      
-      <div>
-      <div class="quarto-title-meta-heading">Published</div>
-      <div class="quarto-title-meta-contents">
-        <p class="date">January 14, 2025</p>
-      </div>
-    </div>
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     
 <!-- main -->
-<main class="content quarto-banner-title-block" id="quarto-document-content">
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Feature Interpretation for a k-Nearest Neighbor Classifier</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">sklearn</div>
+  </div>
+  </div>
 
 
 
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Jenson Chang </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 14, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
 
 
-<p>Understanding the inner workings of machine learning models is crucial in being able to explain the behaviour of the model. A k-Nearest Neighbour (kNN) model does not have coefficients like a linear model that can be used to explain feature importance. SHAP (SHapley Additive exPlanations) is a powerful tool for explaining model predictions, even for models that may seem like a “black box” such as kNN. This post will explain the steps needed to create a SHAP plots to interpret feature importance for using a kNN classifier in scikit-learn.</p>
+</header>
+
+
+<p>Understanding the inner workings of machine learning models is crucial in being able to explain the behavior of the model. A k-Nearest Neighbor (kNN) model does not have coefficients like a linear model that can be used to explain feature importance. SHAP (SHapley Additive explanations) is a powerful tool for explaining model predictions, even for models that may seem like a “black box” such as kNN. This post will explain the steps needed to create a SHAP plots to interpret feature importance for using a kNN classifier in scikit-learn.</p>
 <section id="computing-shap-values" class="level2">
 <h2 class="anchored" data-anchor-id="computing-shap-values">Computing SHAP values</h2>
 <p>The scope of this post is to focus on SHAP plot generation and plot interpretation. Therefore we start with a pre-trained pipeline with a kNN model. The example model used is from <a href="https://github.com/UBC-MDS/academic-success-prediction">UBC MDS Student’s Academic Success Prediction</a> project. This model predicts whether a first year university student would dropout of school using academic and social indicators. Please refer to the GitHub page for more information on the dataset and how the model was developed.</p>
-<section id="step-1" class="level3">
-<h3 class="anchored" data-anchor-id="step-1">Step 1</h3>
+<section id="step-1.-data-preparation" class="level3">
+<h3 class="anchored" data-anchor-id="step-1.-data-preparation">Step 1. Data Preparation</h3>
 <p>To start, we first need perform some preparation steps. We need to first extract the prediction model <code>knn</code> from <code>my_pipeline</code> and transform our training data (<code>X_train</code>) and test data (<code>X_test</code>) with the preprocessor</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the KNN classifier from the pipeline</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>knn <span class="op">=</span> my_pipeline.named_steps[<span class="st">'kneighborsclassifier'</span>]</span>
@@ -202,8 +201,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>X_train_preprocessed <span class="op">=</span> my_pipeline[:<span class="op">-</span><span class="dv">1</span>].transform(X_train)  <span class="co"># Apply all steps except the final classifier</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>X_test_preprocessed <span class="op">=</span> my_pipeline[:<span class="op">-</span><span class="dv">1</span>].transform(X_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="step-2" class="level3">
-<h3 class="anchored" data-anchor-id="step-2">Step 2</h3>
+<section id="step-2.-shap-values" class="level3">
+<h3 class="anchored" data-anchor-id="step-2.-shap-values">Step 2. SHAP Values</h3>
 <p>Since kNN does not provide direct interpretability, we’ll use SHAP’s <code>KernelExplainer</code>, which works with any model that has a <code>predict_proba</code> method.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define SHAP Kernel Explainer with the predict_proba method</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>explainer <span class="op">=</span> shap.KernelExplainer(knn.predict_proba, X_train_preprocessed)</span>
@@ -212,8 +211,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>shap_values <span class="op">=</span> explainer.shap_values(X_test_preprocessed)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The <code>shap_values</code> object now contains SHAP values for all classes. Each element in <code>shap_values</code> corresponds to one class.</p>
 </section>
-<section id="step-3-optional" class="level3">
-<h3 class="anchored" data-anchor-id="step-3-optional">Step 3 (Optional)</h3>
+<section id="step-3.-subsample-optional" class="level3">
+<h3 class="anchored" data-anchor-id="step-3.-subsample-optional">Step 3. Subsample (Optional)</h3>
 <p>Depending on the size of the dataset, the <code>KernelExplainer</code> in the may give a warning about slow runtimes.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -265,8 +264,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="takeaway" class="level2">
 <h2 class="anchored" data-anchor-id="takeaway">Takeaway</h2>
-<p>SHAP plots provide a powerful way to demystify KNN classifiers, which are often considered black-box models. By analyzing SHAP values, you can identify the most influential features for each class.</p>
-<p>SHAP helps bridge the gap between machine learning models and human interpretability, making your models more transparent and trustworthy.</p>
+<p>SHAP plots provide a powerful way to demystify KNN classifiers, which are often considered black-box models. By analyzing SHAP values, we can identify the most influential features for each class.</p>
+<p>SHAP helps bridge the gap between machine learning models and human interpretability, making models more transparent and trustworthy.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<p>“Academic Success Prediction.” https://github.com/UBC-MDS/academic-success-prediction</p>
+<p>SHAP. “Iris Classification with Scikit-Learn: K-Nearest Neighbors.” SHAP Documentation. https://shap.readthedocs.io/en/latest/example_notebooks/tabular_examples/model_agnostic/Iris%20classification%20with%20scikit-learn.html#K-nearest-neighbors.</p>
 
 
 </section>
